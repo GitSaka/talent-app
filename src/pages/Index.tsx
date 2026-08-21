@@ -23,7 +23,7 @@ const Index = () => {
   const { isAdmin, userRole } = useAuth();
   const navigate = useNavigate();
   console.log(dbProducts)
- useEffect(() => {
+useEffect(() => {
     // 1. Récupération des produits
     supabase.from("produits").select("id, titre, prix, image_url, categorie, artisan_id, delai")
       .order("categorie", { ascending: true })
