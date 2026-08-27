@@ -19,7 +19,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://talent-app-silk-ten.vercel.app",
+        redirectTo: window.location.origin,
       },
     });
     if (error) toast.error(error.message);
