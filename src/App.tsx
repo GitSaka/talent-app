@@ -20,7 +20,7 @@ import Messages from "./pages/Messages";
 import Profil from "./pages/Profil";
 import Aide from "./pages/Aide";
 import Parametres from "./pages/Parametres";
-import Verification from "./pages/verification";
+import Verification from "./pages/Verification";
 import MonCompte from "./pages/MonCompte";
 import Publicite from "./pages/Publicite";
 import Chat from "./pages/Chat";
