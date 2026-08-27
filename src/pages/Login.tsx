@@ -14,9 +14,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleOAuth = async (provider: "google" | "apple") => {
+  // Modifié : Uniquement Google
+  const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: "google",
       options: {
         redirectTo: window.location.origin,
       },
@@ -83,12 +84,9 @@ export default function Login() {
           </div>
         </div>
 
-        <Button type="button" variant="outline" size="lg" onClick={() => handleOAuth("google")} className="w-full rounded-xl font-bold">
+        {/* Bouton Google unique */}
+        <Button type="button" variant="outline" size="lg" onClick={handleGoogleLogin} className="w-full rounded-xl font-bold">
           <span className="mr-2">🇬</span> Continuer avec Google
-        </Button>
-        
-        <Button type="button" variant="outline" size="lg" onClick={() => handleOAuth("apple")} className="w-full rounded-xl font-bold">
-          <span className="mr-2">🍏</span> Continuer avec Apple
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">

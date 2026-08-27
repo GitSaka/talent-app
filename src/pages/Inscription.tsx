@@ -21,9 +21,10 @@ export default function Inscription() {
   const [localisation, setLocalisation] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleOAuth = async (provider: "google" | "apple") => {
+  // Modifié : Uniquement Google pour l'instant
+  const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider,
+      provider: "google",
       options: {
         redirectTo: window.location.origin,
       },
@@ -115,7 +116,7 @@ export default function Inscription() {
         </div>
         <div>
           <label className="text-sm font-bold mb-1.5 block">📱 Téléphone</label>
-          <Input value={telephone} onChange={(e) => setTelephone(e.target.value)} placeholder="+221 77 123 45 67" className="rounded-xl py-3 text-base" />
+          <Input value={telephone} onChange={(e) => setTelephone(e.target.value)} placeholder="+229 XX XX XX XX" className="rounded-xl py-3 text-base" />
         </div>
         <div>
           <label className="text-sm font-bold mb-1.5 block">🔒 Mot de passe *</label>
@@ -138,7 +139,7 @@ export default function Inscription() {
             </div>
             <div>
               <label className="text-sm font-bold mb-1.5 block">📍 Localisation</label>
-              <Input value={localisation} onChange={(e) => setLocalisation(e.target.value)} placeholder="Ex: Dakar, Sénégal" className="rounded-xl py-3 text-base" />
+              <Input value={localisation} onChange={(e) => setLocalisation(e.target.value)} placeholder="Ex: Porto-Novo, Bénin" className="rounded-xl py-3 text-base" />
             </div>
           </>
         )}
@@ -146,18 +147,19 @@ export default function Inscription() {
         <Button type="submit" size="lg" disabled={loading} className="w-full rounded-xl text-base font-extrabold bg-accent hover:bg-accent/90 text-accent-foreground">
           <UserPlus size={20} /> {loading ? "Création..." : "Créer mon compte"}
         </Button>
+        
         <div className="relative my-2">
           <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">ou s'inscrire avec</span>
           </div>
         </div>
-        <Button type="button" variant="outline" size="lg" onClick={() => handleOAuth("google")} className="w-full rounded-xl font-bold">
+
+        {/* Bouton Google unique et propre */}
+        <Button type="button" variant="outline" size="lg" onClick={handleGoogleLogin} className="w-full rounded-xl font-bold">
           <span className="mr-2">🇬</span> Continuer avec Google
         </Button>
-        <Button type="button" variant="outline" size="lg" onClick={() => handleOAuth("apple")} className="w-full rounded-xl font-bold">
-          <span className="mr-2">🍎</span> Continuer avec Apple
-        </Button>
+
         <p className="text-center text-sm text-muted-foreground">
           Déjà un compte ?{" "}
           <button type="button" onClick={() => navigate("/connexion")} className="text-primary font-bold">Se connecter</button>
