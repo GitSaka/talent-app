@@ -22,7 +22,7 @@ const Index = () => {
   const [verifiedArtisans, setVerifiedArtisans] = useState<Set<string>>(new Set());
   const { isAdmin, userRole } = useAuth();
   const navigate = useNavigate();
-  console.log(dbProducts)
+  
 useEffect(() => {
     // 1. Récupération des produits
     supabase.from("produits").select("id, titre, prix, image_url, categorie, artisan_id, delai")
@@ -65,7 +65,7 @@ useEffect(() => {
     });
   }, []);
 
-  console.log(dbProducts)
+  
   return (
     <div className="min-h-screen bg-background pb-24">
       <HeroSection />
@@ -125,6 +125,7 @@ useEffect(() => {
 
       {dbProducts.length > 0 && categories.map((cat) => {
         const items = dbProducts.filter((p) => p.categorie?.toLowerCase().trim() === cat.id?.toLowerCase().trim());
+        
         if (items.length === 0) return null;
         return (
           <section key={cat.id} className="px-4 mt-8">

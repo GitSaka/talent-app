@@ -51,7 +51,7 @@ export default function Publier() {
     ensureArtisanProfile();
   }, [user, userRole, artisanProfile, ensuringArtisan, profile?.telephone, refreshVerification]);
 
-  if (authLoading || ensuringArtisan || (user && userRole === null)) {
+  if (authLoading || ensuringArtisan) {
     return (
       <div className="min-h-screen bg-background pb-24">
         <header className="bg-primary text-primary-foreground px-4 py-4 flex items-center gap-3">
