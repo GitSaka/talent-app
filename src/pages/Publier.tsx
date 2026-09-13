@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export default function Publier() {
   const navigate = useNavigate();
-  const { user, profile, userRole, loading: authLoading, artisanProfile, verification, isVerified, isTrialActive, refreshVerification } = useAuth();
+  const { user,userRole, loading: authLoading, artisanProfile, verification, isVerified, isTrialActive, refreshVerification } = useAuth();
   const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
   const [prix, setPrix] = useState("");
@@ -25,33 +25,43 @@ export default function Publier() {
   const fileRef = useRef<HTMLInputElement>(null);
   const attemptedArtisanProfile = useRef(false);
 
-  useEffect(() => {
-    if (!user || userRole !== "artisan" || artisanProfile || ensuringArtisan || attemptedArtisanProfile.current) return;
+ useEffect(() => {
+  // Si pas d'utilisateur ou s'il n'est pas artisan, on ne fait rien
+  if (!user || userRole !== "artisan" || ensuringArtisan || attemptedArtisanProfile.current) return;
 
-    const ensureArtisanProfile = async () => {
-      attemptedArtisanProfile.current = true;
-      setEnsuringArtisan(true);
-      const { error } = await supabase.from("artisans").upsert({
-        user_id: user.id,
-        metier: "Artisan",
-        description: "",
-        localisation: "",
-        phone: profile?.telephone || "",
-        whatsapp: profile?.telephone || "",
-      }, { onConflict: "user_id" });
+  const ensureFullProfile = async () => {
+    attemptedArtisanProfile.current = true;
+    setEnsuringArtisan(true);
 
-      if (error) {
-        toast.error("Impossible d'activer votre profil artisan. Réessayez.");
-      } else {
-        await refreshVerification();
-      }
-      setEnsuringArtisan(false);
-    };
+    // 1. On s'assure que le profil de base existe (puisqu'il a échoué à l'inscription)
+    await supabase.from("profiles").upsert({
+      user_id: user.id,
+      nom: user.user_metadata?.nom || "Artisan",
+      telephone: user.user_metadata?.telephone || "",
+    }, { onConflict: "user_id" });
 
-    ensureArtisanProfile();
-  }, [user, userRole, artisanProfile, ensuringArtisan, profile?.telephone, refreshVerification]);
+    // 2. On s'assure que le profil artisan existe
+    const { error } = await supabase.from("artisans").upsert({
+      user_id: user.id,
+      metier: user.user_metadata?.metier || "Artisan",
+      localisation: user.user_metadata?.localisation || "",
+      phone: user.user_metadata?.telephone || "",
+      whatsapp: user.user_metadata?.telephone || "",
+    }, { onConflict: "user_id" });
 
-  if (authLoading || ensuringArtisan) {
+    if (error) {
+      toast.error("Erreur lors de l'initialisation de votre profil.");
+    } else {
+      await refreshVerification();
+    }
+    setEnsuringArtisan(false);
+  };
+
+  ensureFullProfile();
+}, [user, userRole, ensuringArtisan, refreshVerification]);
+
+
+  if (authLoading || ensuringArtisan || (user && userRole === null)) {
     return (
       <div className="min-h-screen bg-background pb-24">
         <header className="bg-primary text-primary-foreground px-4 py-4 flex items-center gap-3">

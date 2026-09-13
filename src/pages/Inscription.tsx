@@ -32,57 +32,28 @@ export default function Inscription() {
     if (error) toast.error(error.message);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nom || !email || !password) { 
-      toast.error("Remplissez les champs obligatoires"); 
-      return; 
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!nom || !email || !password) { toast.error("Remplissez les champs obligatoires"); return; }
+  if (role === "artisan" && !metier) { toast.error("Choisissez votre métier"); return; }
+  setLoading(true);
+
+  // On envoie tout dans Auth. Les données (role, nom, telephone) sont stockées en sécurité dans les user_metadata.
+  const {error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { nom, role, telephone, metier, localisation }
     }
-    if (role === "artisan" && !metier) { 
-      toast.error("Choisissez votre métier"); 
-      return; 
-    }
-    setLoading(true);
+  });
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { nom, role, telephone, metier, localisation }
-      }
-    });
+  setLoading(false);
+  if (error) { toast.error(error.message); return; }
 
-    if (error) { 
-      setLoading(false); 
-      toast.error(error.message); 
-      return; 
-    }
+  toast.success("Inscription réussie ! Vérifiez votre boîte mail pour confirmer votre compte. 📧");
+  navigate("/connexion"); // On le redirige vers la connexion
+};
 
-    const user = data.user;
-    if (user) {
-      await supabase.from("profiles").upsert({
-        user_id: user.id,
-        nom,
-        telephone,
-      }, { onConflict: "user_id" });
-
-      if (role === "artisan") {
-        await supabase.from("artisans").upsert({
-          user_id: user.id,
-          metier,
-          localisation,
-          phone: telephone,
-          whatsapp: telephone,
-        }, {
-          onConflict: "user_id",
-        });
-      }
-    }
-
-    setLoading(false);
-    toast.success("Compte créé avec succès ! 🎉");
-    navigate("/");
-  };
 
   return (
     <div className="min-h-screen bg-background pb-8">
